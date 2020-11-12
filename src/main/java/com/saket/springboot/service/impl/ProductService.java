@@ -1,28 +1,35 @@
-package com.saket.springboot.service;
+package com.saket.springboot.service.impl;
 
 import com.saket.springboot.domain.Product;
+import com.saket.springboot.exception.ProductNotFoundException;
 import com.saket.springboot.repository.ProductRepository;
+import com.saket.springboot.service.IProductService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
-/**
- * Created by sahan on 4/8/2016.
- */
 @Service
 @Transactional
-public class ProductService {
+@Slf4j
+public class ProductService implements IProductService {
+
+    private final ProductRepository productRepository;
+    private final List<Product> products;
 
     @Autowired
-    private ProductRepository productRepository;
+    public ProductService(ProductRepository productRepository) {
+        this.productRepository = productRepository;
+        products = new ArrayList<>();
+        initProducts();
+    }
 
-    private static List<Product> products = new ArrayList<>();
-
-    static {
+    private void initProducts() {
         products.add(new Product(35.75d, 1000, "Pears baby soap for Kids", "Grocery", "Soap"));
         products.add(new Product(45.50d, 500, "Signal Tooth Brushes Size in (L, M, S)", "Grocery", "Tooth Brushe"));
         products.add(new Product(1500.0d, 100, "Casual Shirt imported from France", "Wear", "Shirt"));
@@ -39,14 +46,14 @@ public class ProductService {
         productRepository.save(products);
     }
 
-    public List<Product> findAll() {
+    public List<Product> getAllProducts() {
         return productRepository.findAll();
     }
 
-    public List<Product> findByQuery(String productKey, String value) {
+    public List<Product> getProducts(String productKey, String value) {
         switch (productKey.toLowerCase()) {
             case "id":
-                return Arrays.asList(productRepository.getOne(Long.valueOf(value)));
+                return Collections.singletonList(productRepository.getOne(Long.valueOf(value)));
             case "name":
                 return productRepository.findByName(value);
             case "category":
@@ -56,5 +63,13 @@ public class ProductService {
         }
     }
 
-
+    @Override
+    public Product getProductByProductId(Long productId) {
+        Product product = productRepository.findOne(productId);
+        if (product == null) {
+            log.error("Product not found " + productId);
+            throw new ProductNotFoundException("Product not found", productId);
+        }
+        return product;
+    }
 }

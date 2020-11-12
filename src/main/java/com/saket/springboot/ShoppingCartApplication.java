@@ -1,7 +1,9 @@
 package com.saket.springboot;
 
-import com.saket.springboot.service.ProductService;
-import com.saket.springboot.service.UserService;
+import com.saket.springboot.service.IProductService;
+import com.saket.springboot.service.IUserService;
+import com.saket.springboot.service.impl.ProductService;
+import com.saket.springboot.service.impl.UserService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -12,12 +14,10 @@ public class ShoppingCartApplication {
 	public static void main(String[] args) {
 		ConfigurableApplicationContext applicationContext = SpringApplication.run(ShoppingCartApplication.class, args);
 
-		ProductService productService = applicationContext.getBean(ProductService.class);
+		IProductService productService = applicationContext.getBean(IProductService.class);
 		productService.saveInitialBatch();
 
-		UserService userService = applicationContext.getBean(UserService.class);
+		IUserService userService = applicationContext.getBean(IUserService.class);
 		userService.saveInitialBatch();
-
-
 	}
 }

@@ -1,7 +1,7 @@
 package com.saket.springboot.controller;
 
 import com.saket.springboot.domain.Product;
-import com.saket.springboot.service.ProductService;
+import com.saket.springboot.service.IProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -14,16 +14,21 @@ import java.util.List;
 @RequestMapping("/products")
 public class ProductController {
 
+    private final IProductService productService;
+
     @Autowired
-    private ProductService productService;
+    public ProductController(IProductService productService) {
+        this.productService = productService;
+    }
+
 
     @RequestMapping(method = RequestMethod.GET, produces = "application/json")
     public List<Product> getAll() {
-        return productService.findAll();
+        return productService.getAllProducts();
     }
 
     @RequestMapping(path = "/search", method = RequestMethod.GET, produces = "application/json")
     public List<Product> getProductsByQuery(@RequestParam("key") String key, @RequestParam("value") String value) {
-        return productService.findByQuery(key, value);
+        return productService.getProducts(key, value);
     }
 }

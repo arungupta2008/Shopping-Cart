@@ -1,12 +1,24 @@
 package com.saket.springboot.domain;
 
+import com.saket.springboot.model.ShoppingCartStatus;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "shopping_cart")
+@Getter
+@Setter
+@NoArgsConstructor
 public class ShoppingCart implements Serializable {
 
     @Id
@@ -18,76 +30,59 @@ public class ShoppingCart implements Serializable {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "product_id")
-    private Product product;
-
-    @Column(name = "stock")
-    @NotNull
-    private Integer stock;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "cart", cascade = CascadeType.ALL)
+    private Set<Item> items = new HashSet<>();
 
     @Column(name = "amount")
     private Double amount;
 
     @Column(name = "status")
-    private String status;
+    private ShoppingCartStatus status;
 
     @Column(name = "date")
     private Date date;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
+    public ShoppingCart(User user) {
         this.user = user;
+        this.date = new Date();
+        this.status = ShoppingCartStatus.ACTIVE;
+        this.amount = 0.0;
+        this.items = new HashSet<>();
     }
 
-    public Product getProduct() {
-        return product;
+    public void addItem(Item itemToUpdate) {
+        Item itemInDb = null;
+        if (items.contains(itemToUpdate)) {
+            itemInDb = items.stream().filter(x -> x.equals(itemToUpdate)).findAny().get();
+        } else {
+            itemInDb = itemToUpdate;
+        }
+        itemInDb.setQuantity(itemToUpdate.getQuantity());
+        itemInDb.setUpdatedAt(new Date());
+        itemToUpdate.setCart(this);
+        items.add(itemInDb);
+        updateAmount();
     }
 
-    public void setProduct(Product product) {
-        this.product = product;
+    private void updateAmount() {
+        this.setAmount(
+                this.items.stream().collect(
+                        Collectors.summarizingDouble(
+                                x -> x.getQuantity() * x.getProduct().getUnitPrice()))
+                        .getSum()
+        );
     }
 
-    public Integer getStock() {
-        return stock;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ShoppingCart that = (ShoppingCart) o;
+        return id.equals(that.id);
     }
 
-    public void setStock(Integer stock) {
-        this.stock = stock;
-    }
-
-    public Double getAmount() {
-        return amount;
-    }
-
-    public void setAmount(Double amount) {
-        this.amount = amount;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
