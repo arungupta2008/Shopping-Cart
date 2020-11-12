@@ -22,6 +22,11 @@ public class HistoryController {
         this.shoppingCartService = shoppingCartService;
     }
 
+    /**
+     * Get all Shopping cart which were purchased before.
+     *
+     * @return
+     */
     @RequestMapping(method = RequestMethod.GET, produces = "application/json")
     public List<ShoppingCart> getAll() {
         return shoppingCartService.getShoppingCarts(ShoppingCartStatus.PURCHASED);

@@ -2,7 +2,7 @@ package com.saket.springboot.service.impl;
 
 import com.saket.springboot.domain.User;
 import com.saket.springboot.exception.UserNotFoundException;
-import com.saket.springboot.repository.UserRepository;
+import com.saket.springboot.repository.IUserRepository;
 import com.saket.springboot.service.IUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,12 +16,12 @@ import java.util.List;
 @Service
 @Transactional
 public class UserService implements IUserService {
-    private final UserRepository userRepository;
+    private final IUserRepository userRepository;
     private final List<User> users;
 
     @Autowired
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserService(IUserRepository IUserRepository) {
+        this.userRepository = IUserRepository;
         this.users = new ArrayList<>();
         initUsers();
     }

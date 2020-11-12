@@ -1,16 +1,17 @@
 package com.saket.springboot.service.impl;
 
 import com.saket.springboot.domain.Product;
+import com.saket.springboot.exception.InvalidSearchKeySuppliedException;
 import com.saket.springboot.exception.ProductNotFoundException;
-import com.saket.springboot.repository.ProductRepository;
+import com.saket.springboot.repository.IProductRepository;
 import com.saket.springboot.service.IProductService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -19,12 +20,12 @@ import java.util.List;
 @Slf4j
 public class ProductService implements IProductService {
 
-    private final ProductRepository productRepository;
+    private final IProductRepository productRepository;
     private final List<Product> products;
 
     @Autowired
-    public ProductService(ProductRepository productRepository) {
-        this.productRepository = productRepository;
+    public ProductService(IProductRepository IProductRepository) {
+        this.productRepository = IProductRepository;
         products = new ArrayList<>();
         initProducts();
     }
@@ -51,16 +52,24 @@ public class ProductService implements IProductService {
     }
 
     public List<Product> getProducts(String productKey, String value) {
+        List<Product> products = new ArrayList<>();
         switch (productKey.toLowerCase()) {
             case "id":
-                return Collections.singletonList(productRepository.getOne(Long.valueOf(value)));
+                products = Collections.singletonList(productRepository.findOne(Long.valueOf(value)));
+                break;
             case "name":
-                return productRepository.findByName(value);
+                products = productRepository.findByName(value);
+                break;
             case "category":
-                return productRepository.findByCategory(value);
+                products = productRepository.findByCategory(value);
+                break;
             default:
-                return new ArrayList<>();
+                throw new InvalidSearchKeySuppliedException(productKey);
         }
+        if (CollectionUtils.isEmpty(products)) {
+            throw new ProductNotFoundException("Products not found", productKey, value);
+        }
+        return products;
     }
 
     @Override

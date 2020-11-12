@@ -20,34 +20,63 @@ public class ShoppingCartController {
         this.shoppingCartService = shoppingCartService;
     }
 
+    /**
+     * Adds Item to cart.
+     *
+     * @param shoppingCartDTO
+     * @return Shopping cart
+     */
     @RequestMapping(method = RequestMethod.POST, produces = "application/json", consumes = "application/json")
     public ShoppingCart addProductItem(@RequestBody ShoppingCartDTO shoppingCartDTO) {
         return shoppingCartService.addItemsInCart(shoppingCartDTO);
     }
 
 
+    /**
+     * Returns as active shopping carts
+     *
+     * @return
+     */
     @RequestMapping(method = RequestMethod.GET, produces = "application/json")
     public List<ShoppingCart> getAllActiveShoppingCart() {
         return shoppingCartService.getShoppingCarts(ShoppingCartStatus.ACTIVE);
     }
 
+    /**
+     * @param shoppingCartDTO
+     * @param cartId
+     * @return updates item for supplied cartId
+     */
     @RequestMapping(method = RequestMethod.PUT, produces = "application/json", consumes = "application/json", value = "/{id}")
     public ShoppingCart updateProductItem(@RequestBody ShoppingCartDTO shoppingCartDTO, @PathVariable("id") Long cartId) {
         return shoppingCartService.updateProduct(shoppingCartDTO, cartId);
     }
 
+    /**
+     * Deletes supplied cart
+     *
+     * @param cartId
+     */
     @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
-    public void deleteProductItem(@PathVariable("id") Long ids) {
-        shoppingCartService.deleteShoppingCart(ids);
+    public void deleteProductItem(@PathVariable("id") Long cartId) {
+        shoppingCartService.deleteShoppingCart(cartId);
     }
 
+    /**
+     * Deletes all cart.
+     */
     @RequestMapping(method = RequestMethod.DELETE)
     public void clearCart() {
         shoppingCartService.clearAllShoppingCarts();
     }
 
+    /**
+     * Marks supplied cart id as purchased also updates inventory and amount.
+     *
+     * @param cartId
+     */
     @RequestMapping(method = RequestMethod.POST, value = "/purchase/{id}")
-    public void purchaseProducts(@PathVariable("id") Long id) {
-        shoppingCartService.purchaseShoppingCart(id);
+    public void purchaseProducts(@PathVariable("id") Long cartId) {
+        shoppingCartService.purchaseShoppingCart(cartId);
     }
 }
