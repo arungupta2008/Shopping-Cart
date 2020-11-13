@@ -16,14 +16,15 @@ import com.saket.springboot.service.IUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import javax.transaction.TransactionScoped;
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Slf4j
 @Service
-@Transactional
+@Transactional(Transactional.TxType.REQUIRED)
 public class ShoppingCartService implements IShoppingCartService {
 
     private final IProductService productService;
@@ -88,6 +89,10 @@ public class ShoppingCartService implements IShoppingCartService {
     @Override
     public void deleteShoppingCart(Long id) {
         log.debug("Deleting Cart: " + id);
+        ShoppingCart shoppingCart = shoppingCartRepository.findOne(id);
+        if(shoppingCart == null){
+            throw new ShoppingCartNotFoundException("Shopping cart not found", id);
+        }
         shoppingCartRepository.delete(id);
     }
 

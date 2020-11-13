@@ -14,7 +14,7 @@ import java.util.List;
 
 @Slf4j
 @Service
-@Transactional
+@Transactional(Transactional.TxType.REQUIRED)
 public class UserService implements IUserService {
     private final IUserRepository userRepository;
     private final List<User> users;

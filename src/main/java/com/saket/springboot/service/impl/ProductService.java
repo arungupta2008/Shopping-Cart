@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Service
-@Transactional
+@Transactional(Transactional.TxType.REQUIRED)
 @Slf4j
 public class ProductService implements IProductService {
 

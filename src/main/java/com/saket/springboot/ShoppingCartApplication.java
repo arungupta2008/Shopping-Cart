@@ -5,6 +5,7 @@ import com.saket.springboot.service.IUserService;
 import com.saket.springboot.service.impl.ProductService;
 import com.saket.springboot.service.impl.UserService;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
