@@ -1,5 +1,5 @@
 ## *Overview*
-Create Sample Shopping Cart Application for home work assignment to the Saket Tiwari.
+Create Sample Shopping Cart Application for home work assignment.
 
 ## *Prerequisites*
 * Java 1.8
